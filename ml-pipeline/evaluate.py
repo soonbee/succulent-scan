@@ -300,7 +300,7 @@ def main():
     parser.add_argument("--checkpoint", type=str, required=True, help="Path to model checkpoint")
     parser.add_argument("--split", type=str, default="val", choices=["val", "test"],
                         help="Which split to evaluate on")
-    parser.add_argument("--data_dir", type=str, default=None, help="Data directory")
+    parser.add_argument("--data_dir", type=str, required=True, help="Data directory")
     parser.add_argument("--splits_dir", type=str, default=None, help="Splits directory")
     args = parser.parse_args()
 

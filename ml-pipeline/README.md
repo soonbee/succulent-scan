@@ -76,10 +76,10 @@ uv run python train.py --fresh
 
 ```bash
 # Validation set
-uv run python evaluate.py --checkpoint ./checkpoints/best_model.pt --split val
+uv run python evaluate.py --checkpoint ./checkpoints/best_model.pt --data_dir ./data --splits_dir ./splits --split val
 
 # Test set (최종 평가)
-uv run python evaluate.py --checkpoint ./checkpoints/best_model.pt --split test
+uv run python evaluate.py --checkpoint ./checkpoints/best_model.pt --data_dir ./data --splits_dir ./splits --split test
 ```
 
 > **Note:** `uv run`은 가상환경을 자동으로 활성화합니다. 가상환경을 직접 활성화한 경우 `python` 명령어만 사용해도 됩니다.

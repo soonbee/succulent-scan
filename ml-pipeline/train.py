@@ -449,7 +449,7 @@ def train(config: Config, logger, fresh: bool = False):
 
 def main():
     parser = argparse.ArgumentParser(description="Train Image Classifier")
-    parser.add_argument("--data_dir", type=str, default=None, help="Data directory")
+    parser.add_argument("--data_dir", type=str, required=True, help="Data directory")
     parser.add_argument("--splits_dir", type=str, default=None, help="Splits directory")
     parser.add_argument("--checkpoint_dir", type=str, default=None, help="Checkpoint directory")
     parser.add_argument("--epochs", type=int, default=None, help="Total epochs")
