@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { Leaf } from 'lucide-vue-next';
 </script>
@@ -15,7 +15,7 @@ import { Leaf } from 'lucide-vue-next';
                 </Link>
             </div>
         </header>
-        <main class="p-4">
+        <main class="mx-auto max-w-4xl px-4 py-8 pb-16">
             <slot />
         </main>
     </div>
