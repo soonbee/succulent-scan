@@ -1,20 +1,38 @@
 <script setup lang="ts">
-import { ImageIcon, Upload } from 'lucide-vue-next';
+import { AlertCircle, ImageIcon, Upload } from 'lucide-vue-next';
 import { ref } from 'vue';
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
 const isOver = ref(false);
+const errorMessage = ref<string | null>(null);
+
+const processFile = (file: File | undefined) => {
+    errorMessage.value = null;
+
+    if (!file) {
+        return;
+    }
+    if (!ACCEPTED_TYPES.includes(file.type)) {
+        errorMessage.value = 'JPG, PNG, WebP 이미지 파일만 업로드할 수 있어요';
+        return;
+    }
+    if (file.size > MAX_FILE_SIZE) {
+        errorMessage.value = '10MB 이하의 파일만 업로드할 수 있어요';
+        return;
+    }
+    console.log('file:', file);
+};
 
 const onFileDrop = (e: DragEvent) => {
     isOver.value = false;
-    const file = e.dataTransfer?.files[0];
-    // TODO
-    console.log(file);
+    processFile(e.dataTransfer?.files[0]);
 };
 
 const onFileChange = (e: Event) => {
     const target = e.target as HTMLInputElement;
-    const file = target.files?.[0];
-    // TODO
-    console.log(file);
+    processFile(target.files?.[0]);
 };
 </script>
 <template>
@@ -26,7 +44,7 @@ const onFileChange = (e: Event) => {
         class="relative flex min-h-70 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 transition-all duration-200"
         :class="isOver ? 'scale-[1.02] border-primary bg-accent/50' : 'border-border bg-card hover:border-primary/50 hover:bg-accent/30'"
     >
-        <input id="file-upload" type="file" class="sr-only" @change="onFileChange" />
+        <input id="file-upload" type="file" class="sr-only" :accept="ACCEPTED_TYPES.join(',')" @change="onFileChange" />
         <div
             class="mb-4 flex h-16 w-16 items-center justify-center rounded-full transition-colors"
             :class="isOver ? 'bg-primary text-primary-foreground' : 'bg-accent text-accent-foreground'"
@@ -40,4 +58,8 @@ const onFileChange = (e: Event) => {
             <p class="text-xs text-muted-foreground">JPG, PNG, WebP 파일 (최대 10MB)</p>
         </div>
     </label>
+    <div v-if="errorMessage" id="upload-error" class="mt-3 flex items-center gap-2 rounded-lg bg-destructive/10 p-3 text-destructive" role="alert">
+        <AlertCircle class="h-4 w-4 shrink-0" />
+        <p class="text-sm">{{ errorMessage }}</p>
+    </div>
 </template>
