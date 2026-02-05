@@ -5,6 +5,10 @@ import { ref } from 'vue';
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
+const emit = defineEmits<{
+    select: [file: File];
+}>();
+
 const isOver = ref(false);
 const errorMessage = ref<string | null>(null);
 
@@ -22,7 +26,7 @@ const processFile = (file: File | undefined) => {
         errorMessage.value = '10MB 이하의 파일만 업로드할 수 있어요';
         return;
     }
-    console.log('file:', file);
+    emit('select', file);
 };
 
 const onFileDrop = (e: DragEvent) => {
