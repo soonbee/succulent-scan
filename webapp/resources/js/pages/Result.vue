@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { ChevronRight, RefreshCcw, TriangleAlert } from 'lucide-vue-next';
+import { Camera, ChevronRight, HelpCircle, RefreshCcw, RefreshCw, TriangleAlert } from 'lucide-vue-next';
 
 import { useUploadedImage } from '@/composables/useUploadedImage';
 import { home } from '@/routes';
@@ -19,10 +19,8 @@ defineProps<{
 const { imageUrl } = useUploadedImage();
 </script>
 <template>
-    <div v-if="!reliable">
-        <p>[WIP] UNKNWON RESULT</p>
-    </div>
-    <div v-else class="mx-auto w-full max-w-2xl">
+    <!-- success -->
+    <div v-if="reliable" class="mx-auto w-full max-w-2xl">
         <div class="mb-8 text-center">
             <h2 class="mb-2 font-serif text-2xl font-semibold text-foreground">다육이 분류 결과</h2>
             <p class="text-muted-foreground">
@@ -122,6 +120,63 @@ const { imageUrl } = useUploadedImage();
                 <RefreshCcw class="mr-2 h-4 w-4" />
                 다른 사진으로 다시 시도하기
             </Link>
+        </div>
+    </div>
+
+    <!-- failure -->
+    <div v-else>
+        <div class="flex flex-col items-center py-8">
+            <div class="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+                <HelpCircle class="h-8 w-8 text-muted-foreground" />
+            </div>
+            <h2 class="mb-2 text-center font-serif text-xl font-medium text-foreground">분석에 실패했어요</h2>
+            <p class="mb-8 max-w-md text-center text-muted-foreground">
+                조금 다른 각도나 환경에서 다시 찍어주시면 결과가 나올 수 있어요. <br />
+                아직 지원하지 않는 종류일 수 있습니다.
+            </p>
+            <div class="mb-8 w-full max-w-md rounded-lg border border-border/60 bg-card text-card-foreground shadow-sm">
+                <div class="p-6 pt-6">
+                    <div class="mb-4 flex items-center gap-2">
+                        <Camera class="h-4 w-4 text-primary" />
+                        <h3 class="font-medium text-foreground">판별이 잘 되도록 사진 찍는 팁</h3>
+                    </div>
+                    <ul class="space-y-2">
+                        <li class="flex items-start gap-2 text-sm text-muted-foreground">
+                            <span
+                                class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-medium text-accent-foreground"
+                                >1</span
+                            >배경은 단순하고 깔끔하게 찍어주세요
+                        </li>
+                        <li class="flex items-start gap-2 text-sm text-muted-foreground">
+                            <span
+                                class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-medium text-accent-foreground"
+                                >2</span
+                            >식물 전체가 화면 안에 보이도록 촬영해주세요
+                        </li>
+                        <li class="flex items-start gap-2 text-sm text-muted-foreground">
+                            <span
+                                class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-medium text-accent-foreground"
+                                >3</span
+                            >강한 그림자 없이 밝은 환경에서 찍어주세요
+                        </li>
+                        <li class="flex items-start gap-2 text-sm text-muted-foreground">
+                            <span
+                                class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-medium text-accent-foreground"
+                                >4</span
+                            >로제트 형태가 식물의 중심 구조가 잘 보이도록 맞춰주세요
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="flex w-full max-w-md flex-col gap-3 sm:flex-row">
+                <Link
+                    :href="home.url()"
+                    class="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium whitespace-nowrap text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+                >
+                    <RefreshCw class="mr-2 h-4 w-4" />
+                    다른 사진으로 시도하기
+                </Link>
+            </div>
         </div>
     </div>
 </template>
