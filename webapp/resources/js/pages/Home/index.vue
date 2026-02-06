@@ -1,17 +1,28 @@
 <script setup lang="ts">
+import { router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
 import UploadZone from '@/components/UploadZone.vue';
+import { useUploadedImage } from '@/composables/useUploadedImage';
+import { store } from '@/routes/analyze';
 
 import Analyzing from './Analyzing.vue';
 import PhotoTips from './PhotoTips.vue';
 import SupportedClasses from './SupportedClasses.vue';
 
 const isLoading = ref(false);
+const { setImage } = useUploadedImage();
 
 const onFileSelect = async (file: File) => {
     isLoading.value = true;
-    console.log('file:', file);
+    setImage(file);
+
+    router.post(store.url(), { image: file }, {
+        forceFormData: true,
+        onError: () => {
+            isLoading.value = false;
+        },
+    });
 };
 </script>
 
