@@ -8,5 +8,5 @@ Route::get('/', function () {
     return Inertia::render('Home/index');
 })->name('home');
 
-Route::get('/analyze', fn () => redirect()->route('home'));
-Route::post('/analyze', [AnalysisController::class, 'store'])->name('analyze.store');
+Route::get('/analysis', fn () => Inertia::render('Analysis'))->name('analysis.index');
+Route::post('/analysis', [AnalysisController::class, 'store'])->name('analysis.store');

@@ -116,7 +116,7 @@ const { imageUrl } = useUploadedImage();
                 class="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-input bg-background px-8 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
             >
                 <RefreshCcw class="mr-2 h-4 w-4" />
-                Upload another photo
+                다른 사진으로 다시 시도하기
             </Link>
         </div>
     </div>

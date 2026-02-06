@@ -26,12 +26,15 @@ class AnalysisController extends Controller
                 'file',
                 file_get_contents($request->file('image')->getRealPath()),
                 $request->file('image')->getClientOriginalName()
-            )->connectTimeout(5)->timeout(30)->post(config('services.inference.url').'/inference');
+            )->timeout(10)->post(config('services.inference.url').'/inference');
 
             if ($response->failed()) {
                 $analysis->update(['status' => 'failed']);
 
-                return redirect()->route('home');
+                return redirect()->route('home')->with('error', [
+                    'title' => '분석을 완료하지 못했어요',
+                    'description' => '다시 한 번 시도해 보시고, 같은 문제가 반복되면 관리자에게 문의해 주세요.',
+                ]);
             }
 
             $results = $response->json();
@@ -52,15 +55,24 @@ class AnalysisController extends Controller
         } catch (ConnectionException $e) {
             $analysis->update(['status' => 'failed']);
 
-            $message = str_contains($e->getMessage(), 'Operation timed out')
-                ? '분석 시간이 초과되었어요. 잠시 후 다시 시도해 주세요.'
-                : '분석 서버에 연결할 수 없어요. 잠시 후 다시 시도해 주세요.';
+            $error = str_contains($e->getMessage(), 'Operation timed out')
+                ? [
+                    'title' => '잠시 요청이 몰리고 있어요',
+                    'description' => '현재 요청이 많아 분석을 바로 처리하지 못했어요. 조금만 기다렸다가 다시 시도해 주세요.',
+                ]
+                : [
+                    'title' => '분석 서버에 연결할 수 없어요',
+                    'description' => '잠시 후 다시 시도해 보시고, 문제가 계속되면 관리자에게 문의해 주세요.',
+                ];
 
-            return redirect()->route('home');
+            return redirect()->route('home')->with('error', $error);
         } catch (\Throwable) {
             $analysis->update(['status' => 'failed']);
 
-            return redirect()->route('home');
+            return redirect()->route('home')->with('error', [
+                'title' => '분석을 완료하지 못했어요',
+                'description' => '다시 한 번 시도해 보시고, 같은 문제가 반복되면 관리자에게 문의해 주세요.',
+            ]);
         }
     }
 }

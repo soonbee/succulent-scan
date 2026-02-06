@@ -1,6 +1,11 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
-import { Leaf } from 'lucide-vue-next';
+import { Link, usePage } from '@inertiajs/vue3';
+import { AlertCircle, Leaf } from 'lucide-vue-next';
+import { computed } from 'vue';
+
+const flash = computed(
+    () => (usePage().props as unknown as { flash: { error?: { title: string; description: string } } }).flash,
+);
 </script>
 
 <template>
@@ -16,6 +21,13 @@ import { Leaf } from 'lucide-vue-next';
             </div>
         </header>
         <main class="mx-auto max-w-4xl px-4 py-8 pb-16">
+            <div v-if="flash.error" class="mb-6 flex gap-2 rounded-lg bg-destructive/10 p-3 text-destructive" role="alert">
+                <AlertCircle class="mt-0.5 h-4 w-4 shrink-0" />
+                <div>
+                    <p class="font-medium">{{ flash.error.title }}</p>
+                    <p class="text-sm">{{ flash.error.description }}</p>
+                </div>
+            </div>
             <slot />
         </main>
     </div>

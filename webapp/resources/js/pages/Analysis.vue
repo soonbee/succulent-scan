@@ -1,6 +1,11 @@
 <script setup lang="ts">
+import { router } from '@inertiajs/vue3';
 import { Leaf } from 'lucide-vue-next';
 import { onMounted, onUnmounted, ref } from 'vue';
+
+import { useUploadedImage } from '@/composables/useUploadedImage';
+import { home } from '@/routes';
+import { store } from '@/routes/analysis';
 
 const messages = [
     '잎 모양을 살펴보고 있어요...',
@@ -11,10 +16,21 @@ const messages = [
 const count = ref(0);
 let timerId: number | undefined;
 
+const { file } = useUploadedImage();
+
 onMounted(() => {
+    if (!file.value) {
+        router.visit(home.url());
+        return;
+    }
+
     timerId = window.setInterval(() => {
         count.value = (count.value + 1) % messages.length;
     }, 1500);
+
+    router.post(store.url(), { image: file.value }, {
+        forceFormData: true,
+    });
 });
 
 onUnmounted(() => {
@@ -23,6 +39,7 @@ onUnmounted(() => {
     }
 });
 </script>
+
 <template>
     <div class="flex flex-col items-center justify-center px-4 py-16">
         <div class="relative">
