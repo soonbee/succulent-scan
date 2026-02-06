@@ -12,13 +12,17 @@ interface ResultItem {
 }
 
 defineProps<{
+    reliable: boolean;
     results: ResultItem[];
 }>();
 
 const { imageUrl } = useUploadedImage();
 </script>
 <template>
-    <div class="mx-auto w-full max-w-2xl">
+    <div v-if="!reliable">
+        <p>[WIP] UNKNWON RESULT</p>
+    </div>
+    <div v-else class="mx-auto w-full max-w-2xl">
         <div class="mb-8 text-center">
             <h2 class="mb-2 font-serif text-2xl font-semibold text-foreground">다육이 분류 결과</h2>
             <p class="text-muted-foreground">

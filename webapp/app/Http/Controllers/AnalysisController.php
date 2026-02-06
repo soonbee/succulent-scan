@@ -37,7 +37,9 @@ class AnalysisController extends Controller
                 ]);
             }
 
-            $results = $response->json();
+            $data = $response->json();
+            $reliable = $data['reliable'];
+            $results = $data['results'];
 
             $analysis->update([
                 'status' => 'completed',
@@ -50,6 +52,7 @@ class AnalysisController extends Controller
             ]);
 
             return Inertia::render('Result', [
+                'reliable' => $reliable,
                 'results' => $results,
             ]);
         } catch (ConnectionException $e) {
