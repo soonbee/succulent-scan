@@ -55,7 +55,7 @@ const { imageUrl } = useUploadedImage();
                 <div class="p-4 sm:p-5">
                     <div class="flex items-center gap-4">
                         <div
-                            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary font-serif text-lg font-bold text-primary-foreground"
+                            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary font-sans text-lg font-bold text-primary-foreground"
                         >
                             1
                         </div>
@@ -90,7 +90,7 @@ const { imageUrl } = useUploadedImage();
                 <div class="p-4 sm:p-5">
                     <div class="flex items-center gap-4">
                         <div
-                            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted font-serif text-lg font-bold text-muted-foreground"
+                            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted font-sans text-lg font-bold text-muted-foreground"
                         >
                             {{ index + 2 }}
                         </div>
