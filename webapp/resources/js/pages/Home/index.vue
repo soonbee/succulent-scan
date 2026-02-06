@@ -19,7 +19,7 @@ const onFileSelect = async (file: File) => {
 
     router.post(store.url(), { image: file }, {
         forceFormData: true,
-        onError: () => {
+        onFinish: () => {
             isLoading.value = false;
         },
     });

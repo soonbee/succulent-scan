@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'inference' => [
+        'url' => env('INFERENCE_API_URL', 'http://localhost:6000'),
+    ],
+
 ];
