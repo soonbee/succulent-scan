@@ -12,6 +12,7 @@ wheels/
 # Outputs
 checkpoints/
 splits/
+index/
 
 # Logs
 *.log
