@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { Link } from '@inertiajs/vue3';
+
+import { description } from '@/routes';
+
 const labels = [
     { ko: '에케베리아', en: 'echeveria' },
     { ko: '하월시아', en: 'haworthia' },
@@ -22,11 +26,13 @@ const labels = [
                     :key="label.en"
                     class="inline-flex items-center rounded-full border border-transparent bg-secondary px-3 py-1.5 text-sm font-semibold text-secondary-foreground transition-colors hover:bg-secondary/80 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none"
                 >
-                    {{ label.ko }}(
-                    <span class="capitalize">
-                        {{ label.en }}
-                    </span>
-                    )
+                    <Link :href="description({ query: { genus: label.en } }).url">
+                        {{ label.ko }}(
+                        <span class="capitalize">
+                            {{ label.en }}
+                        </span>
+                        )
+                    </Link>
                 </div>
             </div>
         </div>

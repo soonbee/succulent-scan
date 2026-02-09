@@ -49,7 +49,7 @@ const { imageUrl } = useUploadedImage();
         </div>
         <div class="mb-8 space-y-3">
             <div
-                class="group cursor-pointer rounded-lg border border-primary bg-primary/5 text-card-foreground shadow-sm transition-all duration-200 hover:bg-primary/10 hover:shadow-md"
+                class="group rounded-lg border border-primary bg-primary/5 text-card-foreground shadow-sm transition-all duration-200 hover:bg-primary/10 hover:shadow-md"
                 role="button"
                 tabindex="0"
                 aria-label="View details for Aeonium, ranked 1 with 78% confidence"
@@ -84,7 +84,7 @@ const { imageUrl } = useUploadedImage();
             <div
                 v-for="(item, index) in results.slice(1)"
                 :key="item.en"
-                class="group cursor-pointer rounded-lg border border-border bg-card text-card-foreground shadow-sm transition-all duration-200 hover:border-primary/50 hover:shadow-md"
+                class="group rounded-lg border border-border bg-card text-card-foreground shadow-sm transition-all duration-200 hover:border-primary/50 hover:shadow-md"
                 role="button"
                 tabindex="0"
                 aria-label="View details for Echeveria, ranked 2 with 48% confidence"
