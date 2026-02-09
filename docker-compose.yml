@@ -1,0 +1,40 @@
+services:
+  webapp:
+    build: ./webapp
+    ports:
+      - "80:80"
+    environment:
+      - APP_KEY=${APP_KEY}
+      - APP_ENV=${APP_ENV:-local}
+      - APP_URL=${APP_URL}
+      - INFERENCE_API_URL=http://inference-server:6000
+    volumes:
+      - db-data:/app/database
+      - upload-data:/app/storage/app/public
+    depends_on:
+      inference-server:
+        condition: service_healthy
+
+  inference-server:
+    build:
+      context: ./inference-server
+      args:
+        DEVICE: ${DEVICE:-gpu}
+    volumes:
+      - ${INDEX_DIR:-.}/index:/data/index
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:6000/healthz')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db-data:
+  upload-data:
