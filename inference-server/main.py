@@ -40,11 +40,9 @@ KO_NAMES = {
 IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD = [0.229, 0.224, 0.225]
 
-# Env-configurable paths
-INDEX_DIR = os.environ.get(
-    "INDEX_DIR",
-    str(Path(__file__).resolve().parent.parent / "ml-pipeline" / "index"),
-)
+INDEX_DIR = os.environ.get("INDEX_DIR")
+if not INDEX_DIR:
+    raise RuntimeError("INDEX_DIR environment variable is required")
 
 # Shared state populated during lifespan
 state = {}
