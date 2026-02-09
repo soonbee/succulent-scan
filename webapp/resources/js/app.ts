@@ -6,7 +6,7 @@ import { createApp, h } from 'vue';
 import '../css/app.css';
 import Layout from './layouts/Layout.vue';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = '다육도감';
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
