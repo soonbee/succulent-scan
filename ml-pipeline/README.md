@@ -84,6 +84,50 @@ uv run python evaluate.py --checkpoint ./checkpoints/best_model.pt --data_dir ./
 
 > **Note:** `uv run`은 가상환경을 자동으로 활성화합니다. 가상환경을 직접 활성화한 경우 `python` 명령어만 사용해도 됩니다.
 
+### 4. 인덱스 빌드
+
+학습된 모델로부터 Faiss 인덱스와 TorchScript 모델을 생성합니다. inference-server 배포 시 필요한 파일들이 `index/` 디렉토리에 저장됩니다.
+
+```bash
+uv run python build_index.py --data_dir ./data --checkpoint ./checkpoints/best_model.pt
+```
+
+| 옵션 | 기본값 | 설명 |
+|------|--------|------|
+| `--data_dir` | (필수) | 데이터셋 루트 디렉토리 |
+| `--checkpoint` | (필수) | 모델 체크포인트 경로 |
+| `--output_dir` | `./index` | 출력 디렉토리 |
+| `--batch_size` | `64` | 임베딩 추출 배치 크기 |
+
+**생성되는 파일:**
+```
+index/
+├── model.pt              # TorchScript 모델 (inference-server에서 사용)
+├── gallery.index         # Faiss 인덱스
+├── gallery_labels.npy    # 갤러리 라벨
+└── class_to_idx.json     # 클래스명 → 인덱스 매핑
+```
+
+### 5. 인덱스 검증
+
+빌드된 인덱스 파일들의 무결성을 검증합니다.
+
+```bash
+uv run python verify_index.py --index_dir ./index
+```
+
+| 옵션 | 기본값 | 설명 |
+|------|--------|------|
+| `--index_dir` | `./index` | 검증할 인덱스 디렉토리 |
+
+**검증 항목:**
+1. 필수 파일 존재 여부 (`model.pt`, `gallery.index`, `gallery_labels.npy`, `class_to_idx.json`)
+2. Faiss 인덱스 로드 및 차원 확인 (512)
+3. 인덱스 벡터 수 == 라벨 수 일치
+4. 라벨 범위 유효성 (0 ~ num_classes-1)
+5. class_to_idx 인덱스 연속성 (0..N-1)
+6. TorchScript 모델 로드 및 출력 shape 검증
+
 ## Project Structure
 
 ```
@@ -94,9 +138,12 @@ ml-pipeline/
 ├── model.py           # EfficientNet + ArcFace
 ├── train.py           # 학습 루프
 ├── evaluate.py        # Faiss 기반 평가
+├── build_index.py     # Faiss 인덱스 + TorchScript 모델 빌드
+├── verify_index.py    # 인덱스 무결성 검증
 ├── utils.py           # 유틸리티 함수
 ├── splits/            # Split 파일
-└── checkpoints/       # 모델 체크포인트
+├── checkpoints/       # 모델 체크포인트
+└── index/             # 인덱스 파일 (inference-server 배포용)
 ```
 
 ## Environment Notes

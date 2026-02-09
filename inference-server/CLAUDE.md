@@ -2,7 +2,7 @@
 
 ## 1. Overview
 * FastAPI-based inference server. Accepts succulent plant images and returns genus classification results.
-* Loads trained model checkpoints and Faiss index from `ml-pipeline`.
+* Loads TorchScript model and Faiss index from `ml-pipeline`.
 * Single-file architecture (`main.py`).
 
 ## 2. Running
@@ -40,8 +40,7 @@ Health check. Returns `{"status": "ok", "timestamp": "..."}`.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CHECKPOINT_PATH` | `../ml-pipeline/checkpoints/best_model.pt` | Model checkpoint path |
-| `INDEX_DIR` | `../ml-pipeline/index` | Faiss index directory (`gallery.index`, `gallery_labels.npy`, `class_to_idx.json`) |
+| `INDEX_DIR` | `../ml-pipeline/index` | Index directory (`model.pt`, `gallery.index`, `gallery_labels.npy`, `class_to_idx.json`) |
 | `DISTANCE_THRESHOLD` | `1.0` | OOD detection: upper bound for Top-1 Faiss distance |
 | `MARGIN_THRESHOLD` | `0.05` | OOD detection: lower bound for weighted vote score margin between rank 1 and 2 |
 | `CONCENTRATION_THRESHOLD` | `0.3` | OOD detection: lower bound for Top-K neighbor concentration of the top-1 class |
@@ -56,7 +55,7 @@ Health check. Returns `{"status": "ok", "timestamp": "..."}`.
 
 ## 6. Dependencies
 * Python >= 3.12
-* Imports `create_model` from `ml-pipeline/model.py` via `sys.path`
+* Model loaded via `torch.jit.load` (TorchScript) — no dependency on `ml-pipeline` source code
 * Package management: `uv` (`pyproject.toml` + `uv.lock`)
 
 ## 7. Code Style

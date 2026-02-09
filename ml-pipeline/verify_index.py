@@ -14,6 +14,7 @@ from pathlib import Path
 
 import faiss
 import numpy as np
+import torch
 
 from utils import load_json
 
@@ -27,9 +28,10 @@ def verify(index_dir: Path) -> list[str]:
     index_path = index_dir / "gallery.index"
     labels_path = index_dir / "gallery_labels.npy"
     class_to_idx_path = index_dir / "class_to_idx.json"
+    model_path = index_dir / "model.pt"
 
     # 1. File existence
-    for path in [index_path, labels_path, class_to_idx_path]:
+    for path in [index_path, labels_path, class_to_idx_path, model_path]:
         if not path.exists():
             errors.append(f"Missing file: {path}")
     if errors:
@@ -94,6 +96,31 @@ def verify(index_dir: Path) -> list[str]:
             f"class_to_idx indices are not contiguous 0..{num_classes - 1}:"
             f" got {sorted(actual_indices)}"
         )
+
+    # 8. TorchScript model verification
+    try:
+        ts_model = torch.jit.load(str(model_path), map_location="cpu")
+    except Exception as e:
+        errors.append(f"Failed to load TorchScript model: {e}")
+        return errors
+
+    try:
+        ts_model.eval()
+        dummy = torch.randn(1, 3, 480, 480)
+        with torch.no_grad():
+            logits, embeddings = ts_model(dummy)
+        if embeddings.shape[1] != index.d:
+            errors.append(
+                f"TorchScript embedding dim {embeddings.shape[1]}"
+                f" != index dim {index.d}"
+            )
+        if logits.shape[1] != num_classes:
+            errors.append(
+                f"TorchScript logits dim {logits.shape[1]}"
+                f" != num_classes {num_classes}"
+            )
+    except Exception as e:
+        errors.append(f"TorchScript model inference failed: {e}")
 
     return errors
 

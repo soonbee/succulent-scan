@@ -1,7 +1,6 @@
 import io
 import json
 import os
-import sys
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from pathlib import Path
@@ -17,12 +16,6 @@ from fastapi import FastAPI, HTTPException, UploadFile
 from PIL import Image
 from torchvision import transforms
 from torchvision.transforms import InterpolationMode
-
-# Add ml-pipeline to path to reuse model architecture
-ML_PIPELINE_DIR = str(Path(__file__).resolve().parent.parent / "ml-pipeline")
-sys.path.insert(0, ML_PIPELINE_DIR)
-
-from model import create_model
 
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".webp", ".png"}
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
@@ -48,10 +41,6 @@ IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD = [0.229, 0.224, 0.225]
 
 # Env-configurable paths
-CHECKPOINT_PATH = os.environ.get(
-    "CHECKPOINT_PATH",
-    str(Path(__file__).resolve().parent.parent / "ml-pipeline" / "checkpoints" / "best_model.pt"),
-)
 INDEX_DIR = os.environ.get(
     "INDEX_DIR",
     str(Path(__file__).resolve().parent.parent / "ml-pipeline" / "index"),
@@ -73,7 +62,6 @@ def build_transform(image_size: int = 480) -> transforms.Compose:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     index_dir = Path(INDEX_DIR)
-    checkpoint_path = Path(CHECKPOINT_PATH)
 
     # Load class_to_idx
     class_to_idx_path = index_dir / "class_to_idx.json"
@@ -81,7 +69,6 @@ async def lifespan(app: FastAPI):
         class_to_idx = json.load(f)
 
     idx_to_class = {v: k for k, v in class_to_idx.items()}
-    num_classes = len(class_to_idx)
 
     # Load Faiss index
     index = faiss.read_index(str(index_dir / "gallery.index"))
@@ -89,23 +76,10 @@ async def lifespan(app: FastAPI):
     # Load gallery labels
     gallery_labels = np.load(str(index_dir / "gallery_labels.npy"))
 
-    # Load model
+    # Load TorchScript model
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    checkpoint = torch.load(str(checkpoint_path), map_location=device)
-
-    checkpoint_config = checkpoint.get("config")
-    if checkpoint_config is not None:
-        embedding_dim = checkpoint_config.get("embedding_dim", 512)
-    else:
-        embedding_dim = 512
-
-    model = create_model(
-        num_classes=num_classes,
-        embedding_dim=embedding_dim,
-        pretrained=False,
-        device=device,
-    )
-    model.load_state_dict(checkpoint["model_state_dict"])
+    model_path = index_dir / "model.pt"
+    model = torch.jit.load(str(model_path), map_location=device)
     model.eval()
 
     transform = build_transform()
@@ -158,8 +132,7 @@ async def inference(file: UploadFile):
 
     # Extract embedding and ArcFace logits
     with torch.no_grad():
-        embedding = state["model"].get_embeddings(tensor)
-        arcface_logits = state["model"].arcface(embedding)  # (1, num_classes)
+        arcface_logits, embedding = state["model"](tensor)
     embedding_np = embedding.cpu().numpy().astype(np.float32)
 
     # Faiss Top-20 search

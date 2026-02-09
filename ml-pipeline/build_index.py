@@ -94,10 +94,29 @@ def main():
         pretrained=False,
         arcface_s=config.model.arcface_s,
         arcface_m=config.model.arcface_m_finetune,
-        device=device,
+        device="cpu",
     )
     model.load_state_dict(checkpoint["model_state_dict"])
     logger.info(f"Loaded model from epoch {checkpoint.get('epoch', 'unknown')}")
+
+    # TorchScript export (on CPU, before moving to GPU)
+    model.eval()
+    dummy_input = torch.randn(1, 3, config.data.image_size, config.data.image_size)
+    traced_model = torch.jit.trace(model, dummy_input)
+
+    # Verify traced output matches original
+    with torch.no_grad():
+        orig_logits, orig_emb = model(dummy_input)
+        traced_logits, traced_emb = traced_model(dummy_input)
+        assert torch.allclose(orig_logits, traced_logits, atol=1e-5)
+        assert torch.allclose(orig_emb, traced_emb, atol=1e-5)
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    traced_model.save(str(output_dir / "model.pt"))
+    logger.info(f"Saved TorchScript model: {output_dir / 'model.pt'}")
+
+    # Move to device for embedding extraction
+    model = model.to(device)
 
     # 3. Create dataset with validation transform (deterministic, no augmentation)
     transform = get_val_transform(config.augmentation, config.data.image_size)
